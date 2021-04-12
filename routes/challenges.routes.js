@@ -1,6 +1,6 @@
 const express = require('express');
 let router = express.Router();
-const tutorialController = require('../controllers/tutorials.controller');
+const challengesController = require('../controllers/challenges.controller');
 
 // middleware for all routes related with tutorials
 router.use((req, res, next) => {
@@ -12,22 +12,24 @@ router.use((req, res, next) => {
     next()
 })
 
-router.route('/')
-    .get(tutorialController.findAll)
-    // .post(tutorialController.create)
+router.route('/challenges')
+    .get(challengesController.findAll)
+    .post(challengesController.create)
 
-router.route('/published')
-    .get(tutorialController.findAllPublished)
 
-router.route('/:tutorialID')
-    .get(tutorialController.findOne)
-    .delete(tutorialController.delete)
-    .put(tutorialController.update)
+
+// router.route('/published')
+//     .get(challengesController.findAllPublished)
+
+router.route('challenges/:challengeID')
+    .get(challengesController.findOne)
+    .delete(challengesController.delete)
+    .put(challengesController.update)
 
 
 //send a predefined error message for invalid routes on TUTORIALS
 router.all('*', function (req, res) {
-    res.status(404).json({ message: 'TUTORIALS: what???' });
+    res.status(404).json({ message: 'CHALLENGES: what???' });
 })
 
 // EXPORT ROUTES (required by APP)
