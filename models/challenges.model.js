@@ -12,10 +12,10 @@ const Challenge = function (challenge) {
 
 Challenge.getAll = (title, result) => {
 
-    let queryStr = "SELECT * FROM challenge"
+    let queryStr = "SELECT id_challenge, title, description, date_ini, date_end, scheme, area, state FROM challenge, scientific_area, state WHERE challenge.id_area = scientific_area.id_area AND challenge.id_state = state.id_state"
 
     if (title) {
-        queryStr += " WHERE title LIKE ?"
+        queryStr += " AND title LIKE ?"
     }
     sql.query(queryStr, [`%${title}%`], (err, res) => {
         if (err) {
@@ -32,7 +32,7 @@ Challenge.getAll = (title, result) => {
 
 
 Challenge.findById = (id, result) => {
-    sql.query("SELECT * FROM challenge WHERE id_challenge = ?", [id], (err, res) => {
+    sql.query("SELECT id_challenge, title, description, date_ini, date_end, scheme, area, state FROM challenge, scientific_area, state WHERE challenge.id_area = scientific_area.id_area AND challenge.id_state = state.id_state AND id_challenge = ?", [id], (err, res) => {
         if (err) {
             result(err, null);
             return;
