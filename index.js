@@ -12,7 +12,7 @@ app.use(express.json()); //enable parsing JSON body data
 
 // root route -- /api/
 app.get('/', function (req, res) {
-    res.status(200).json({ message: 'home -- CHALLENGES api' });
+    res.status(200).json({ message: 'home -- webp2 api' });
 });
 
 // routing middleware for resource CHALLENGES

@@ -12,22 +12,22 @@ router.use((req, res, next) => {
     next()
 })
 
-router.route('/challenges')
+router.route('/')
     .get(challengesController.findAll)
-    .post(challengesController.create)
+    // .post(challengesController.create)
 
 
 
 // router.route('/published')
 //     .get(challengesController.findAllPublished)
 
-router.route('challenges/:challengeID')
+router.route('/:challengeID')
     .get(challengesController.findOne)
-    .delete(challengesController.delete)
-    .put(challengesController.update)
+//     .delete(challengesController.delete)
+//     .put(challengesController.update)
 
 
-//send a predefined error message for invalid routes on TUTORIALS
+//send a predefined error message for invalid routes on CHALLENGES
 router.all('*', function (req, res) {
     res.status(404).json({ message: 'CHALLENGES: what???' });
 })
