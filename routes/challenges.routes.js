@@ -14,17 +14,15 @@ router.use((req, res, next) => {
 
 router.route('/')
     .get(challengesController.findAll)
-    // .post(challengesController.create)
-
-
+    .post(challengesController.create)
 
 // router.route('/published')
 //     .get(challengesController.findAllPublished)
 
 router.route('/:challengeID')
     .get(challengesController.findOne)
-//     .delete(challengesController.delete)
-//     .put(challengesController.update)
+    .delete(challengesController.delete)
+    .put(challengesController.update)
 
 
 //send a predefined error message for invalid routes on CHALLENGES
