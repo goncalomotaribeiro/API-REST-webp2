@@ -1,8 +1,9 @@
 const express = require('express');
-let router = express.Router();
+
 const challengesController = require('../controllers/challenges.controller');
 
-// middleware for all routes related with tutorials
+let router = express.Router();
+
 router.use((req, res, next) => {
     const start = Date.now();
     res.on("finish", () => { //finish event is emitted once the response is sent to the client

@@ -1,14 +1,13 @@
-require('dotenv').config(); // read environment variables from .env file
+require('dotenv').config();
 const express = require('express');
-const cors = require('cors'); // middleware to enable CORS (Cross-Origin Resource Sharing)
+const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 8080; // if not defined, use port 8080
-const host = process.env.HOST || '0.0.0.0'; // if not defined, localhost
+const port = process.env.PORT || 8080;
+const host = process.env.HOST || '127.0.0.1';
 
-
-app.use(cors()); //enable ALL CORS requests (client requests from other domain)
-app.use(express.json()); //enable parsing JSON body data
+app.use(cors());
+app.use(express.json());
 
 // root route -- /api/
 app.get('/', function (req, res) {
