@@ -15,7 +15,7 @@ app.get('/', function (req, res) {
 });
 
 // routing middleware for resource CHALLENGES
-app.use('/challenges', require('./routes/challenges.routes.js'))
+app.use('/challenges', require('./routes/Challenge.routes.js'))
 
 // handle invalid routes
 app.get('*', function (req, res) {

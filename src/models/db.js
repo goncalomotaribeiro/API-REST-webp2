@@ -22,11 +22,11 @@ sequelize.authenticate()
         console.error('Unable to connect to the database:', err);
     });
 
-    
+
 const db = {};
 db.sequelize = sequelize; //export the Sequelize instance (actual connection pool)
 
 //export Challenge model (and add here any other models defined within the API)
-db.challenge = require("./challenges.model.js")(sequelize, DataTypes);
+db.challenge = require("./Challenge.model.js")(sequelize, DataTypes);
 
 module.exports = db;

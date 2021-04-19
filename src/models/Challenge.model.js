@@ -7,7 +7,16 @@ module.exports = (sequelize, DataTypes) => {
         },
         description: {
             type: DataTypes.STRING
-        }
+        },
+        date_ini: {
+            type: DataTypes.DATE
+        },
+        date_end: {
+            type: DataTypes.DATE
+        },
+        scheme: {
+            type: DataTypes.STRING
+        },
     }, {
         timestamps: false
     });

@@ -1,7 +1,7 @@
 const db = require('../models/db.js');
 const Challenge = db.challenge;
 
-// Display list of all challenges
+// Display all Challenges
 exports.findAll = (req, res) => {
     
     Challenge.findAll()
@@ -16,16 +16,14 @@ exports.findAll = (req, res) => {
         });
 };
 
-// Handle challenge creation on POST
+// Challenge creation
 exports.create = (req, res) => {
 
-    // Save Challenge in the database (IF request body data is validated by Sequelize
     Challenge.create(req.body)
         .then(data => {
             res.status(201).json({ message: "New challenge created.", location: "/challenges/" + data.id });
         })
         .catch(err => {
-            // Challenge model as validation for the title column (not null)
             if (err.name === 'SequelizeValidationError')
                 res.status(400).json({ message: err.errors[0].message });
             else
@@ -35,22 +33,21 @@ exports.create = (req, res) => {
         });
 };
 
-// List just one challenge
+// List just one Challenge
 exports.findOne = (req, res) => {
 
-    // Challenge.findById(req.params.challengeID, (err, data) => {
-    //     if (err) {
-    //         if (err.kind === "not_found")
-    //             res.status(404).json({
-    //                 message: `Not found Challenge with id ${req.params.challengeID}.`
-    //             });
-    //         else
-    //             res.status(500).json({
-    //                 message: `Error retrieving Challenge with id ${req.params.challengeID}.`
-    //             });
-    //     } else
-    //         res.status(200).json(data); // all is OK, send response data back to client
-    // });
+   Challenge.findByPk(req.params.challengeID)
+        .then(data => {
+            if(!data) {
+                return res.status(404).json({ message: `Not found Challenge with id ${req.params.challengeID}.`});
+            }
+            res.status(200).json(data);
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: `Error retrieving Challenge with id ${req.params.challengeID}.`
+            });
+        });
 };
 
 exports.update = (req, res) => {
@@ -66,7 +63,7 @@ exports.update = (req, res) => {
     //     description: req.body.description,
     //     published: req.body.published ? req.body.published : false
     // };
-
+z
     // // Update Challenge in the database
     // Challenge.updateById(req.params.challengeID, challenge, (err, data) => {
     //     if (err) {

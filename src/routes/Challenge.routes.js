@@ -1,6 +1,6 @@
 const express = require('express');
 
-const challengesController = require('../controllers/challenges.controller');
+const challengesController = require('../controllers/Challenge.controller');
 
 let router = express.Router();
 
