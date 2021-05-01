@@ -1,5 +1,6 @@
 const db = require("../models/index.js");
 const Submission = db.submission;
+const { Op } = require('sequelize')
 
 const getPagination = (page, size) => {
     const limit = size ? parseInt(size) : 3; // limit = size (default is 3)
@@ -8,30 +9,47 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-    // data from findAndCountAll function as the form
-    // {
-    //     count: 5,
-    //     rows: [
-    //              tutorial {...}
-    //         ]
-    // }
     const totalItems = data.count; 
-    const tutorials = data.rows;
+    const submissions = data.rows;
     const currentPage = page ;
     const totalPages = Math.ceil(totalItems / limit);
  
-    return { totalItems, tutorials, totalPages, currentPage };
+    return { totalItems, submissions, totalPages, currentPage };
 };
 
 // Display list of all submissions
 exports.findAll = (req, res) => {
 
-    const { page, size, title } = req.query;
-    const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+    let { page, size, id_user } = req.query;
+    let condition
+    if(id_user && req.params.challengeID){
+        condition = {[Op.and]: [ {id_user: id_user}, {id_challenge: req.params.challengeID}]}
+    }else if(id_user){
+        condition =  {id_user: id_user}
+    }else if(req.params.challengeID){
+        condition = { id_challenge: { [Op.eq]: req.params.challengeID } }
+    }
+    else{condition = null}
 
+    // validate page
+    if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g)) {
+        res.status(400).json({ message: 'Page number must be 0 or a positive integer' });
+        return;
+    }
+    else
+        page = parseInt(page);
+    
+    // validate size
+    if (size && !req.query.size.match(/^([1-9]\d*)$/g)) {
+        res.status(400).json({ message: 'Size must be a positive integer' });
+        return;
+    } else
+        size = parseInt(size);
+
+    // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    Submission.findAndCountAll({attributes: ['url', 'date', 'id_user', 'id_challenge']
+    Submission.findAndCountAll({attributes: ['id','url', 'date', 'id_user', 'id_challenge']
         , where: condition, limit, offset})
 
         .then(data => {
@@ -45,7 +63,6 @@ exports.findAll = (req, res) => {
             });
         });
 };
-
 
 // Create one submission
 exports.createSubmission = async (req, res) => {
@@ -129,21 +146,3 @@ exports.delete = (req, res) => {
             });
         });
 };
-
-// // Display list of all published tutorials
-// exports.findAllPublished = (req, res) => {
-
-//     const { page, size, title } = req.query;
-//     const { limit, offset } = getPagination(page, size);
-//     Tutorial.findAndCountAll({ where: {published: true}, limit, offset })
-//         .then(data => {
-//             const response = getPagingData(data, page, limit);
-//             res.status(200).json(response);
-//         })
-//         .catch(err => {
-//             res.status(500).json({
-//                 message:
-//                     err.message || "Some error occurred while retrieving tutorials."
-//             });
-//         });
-// };

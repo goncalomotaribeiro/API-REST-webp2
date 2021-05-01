@@ -35,11 +35,10 @@ db.challenge = require("./Challenge.model.js")(sequelize, DataTypes);
 //export User model
 db.submission = require("./Submission.model.js")(sequelize, DataTypes);
 
-// //define the 1:N relationship
-// db.user.hasMany(db.submission);
-// db.submission.belongsTo(db.user)
-
 db.challenge.hasMany(db.submission, {foreignKey: 'id_challenge'});
-db.submission.belongsTo(db.challenge)
+db.submission.belongsTo(db.challenge, {foreignKey: 'id_challenge'})
+
+db.user.hasMany(db.submission, {foreignKey: 'id_user'});
+db.submission.belongsTo(db.user, {foreignKey: 'id_user'})
 
 module.exports = db;

@@ -21,9 +21,9 @@ module.exports = (sequelize, DataTypes) => {
         url: {
             type: DataTypes.STRING
         },
-        profile_picture: {
-            type: DataTypes.BLOB
-        },
+        // profile_picture: {
+        //     type: DataTypes.BLOB
+        // },
         id_school: {
             type: DataTypes.INTEGER
         },

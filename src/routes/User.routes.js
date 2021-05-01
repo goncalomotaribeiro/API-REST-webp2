@@ -18,11 +18,8 @@ router.route('/')
     .get(userController.findAll)
     .post(userController.create);
 
-// //needs to be BEFORE route /:tutorialID (otherwise, "published" string will be treated as an ID)
-// router.route('/published')
-//     .get(tutorialController.findAllPublished)
-// router.route('/commented')
-//     .get(tutorialController.findAllCommented)
+router.route('/submitted')
+    .get(userController.findAllWithSubmissions)
 
 router.route('/:userID')
     .get(userController.findOne)

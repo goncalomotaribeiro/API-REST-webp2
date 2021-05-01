@@ -44,7 +44,7 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    Challenge.findAndCountAll({ where: condition, limit, offset})
+    Challenge.findAndCountAll({ where: condition, limit, offset, include: Submission})
         .then(data => {
             const response = getPagingData(data, offset, limit);
             res.status(200).json(response);

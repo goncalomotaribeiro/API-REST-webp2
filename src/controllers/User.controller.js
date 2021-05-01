@@ -1,6 +1,7 @@
 // const Tutorial = require('../models/tutorials.model.js');
 const db = require('../models/index.js');
 const User = db.user;
+const Submission = db.submission
 const {Op} = require('sequelize')
 
 const getPagination = (page, size) => {
@@ -10,13 +11,6 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-    // data from findAndCountAll function as the form
-    // {
-    //     count: 5,
-    //     rows: [
-    //              user {...}
-    //         ]
-    // }
     const totalItems = data.count; 
     const users = data.rows;
     const currentPage = page ;
@@ -28,12 +22,29 @@ const getPagingData = (data, page, limit) => {
 // Display list of all users
 exports.findAll = (req, res) => {
 
-    const { page, size, title } = req.query;
-    const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+    //get data from request query string
+    let { page, size, username } = req.query;
+    const condition = username ? { username: { [Op.like]: `%${username}%` } } : null;
 
+    // validate page
+    if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g)) {
+        res.status(400).json({ message: 'Page number must be 0 or a positive integer' });
+        return;
+    }
+    else
+        page = parseInt(page);
+    
+    // validate size
+    if (size && !req.query.size.match(/^([1-9]\d*)$/g)) {
+        res.status(400).json({ message: 'Size must be a positive integer' });
+        return;
+    } else
+        size = parseInt(size);
+
+    // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    User.findAndCountAll({ where: condition, limit, offset})
+    User.findAndCountAll({ where: condition, limit, offset, include: Submission})
         .then(data => {
             const response = getPagingData(data, page, limit);
             res.status(200).json(response);
@@ -122,34 +133,20 @@ exports.delete = (req, res) => {
         });
 };
 
-// // Display list of all published tutorials
-// exports.findAllPublished = (req, res) => {
-
-//     const { page, size, title } = req.query;
-//     const { limit, offset } = getPagination(page, size);
-//     Tutorial.findAndCountAll({ where: {published: true}, limit, offset })
-//         .then(data => {
-//             const response = getPagingData(data, page, limit);
-//             res.status(200).json(response);
-//         })
-//         .catch(err => {
-//             res.status(500).json({
-//                 message:
-//                     err.message || "Some error occurred while retrieving tutorials."
-//             });
-//         });
-// };
-
-// // Display list of all submissions from a user
-// exports.findAllSubmitedByUser = (req, res) => {
-//     Tutorial.findAndCountAll({ include: { model: Submission, required: true}})
-//         .then(data => {
-//             res.status(200).json(data);
-//         })
-//         .catch(err => {
-//             res.status(500).json({
-//                 message:
-//                     err.message || "Some error occurred while retrieving users."
-//             });
-//         });
-// };
+// Display list of all users with submissions
+exports.findAllWithSubmissions = async (req, res) => {
+    try {
+        let data = await User.findAll({
+            include: {
+                model: Submission, required: true,
+                attributes: []
+            }
+        })
+        res.status(200).json(data)
+    } catch (err) {
+        res.status(500).json({
+            message:
+                err.message || "Some error occurred while retrieving users."
+        });
+    };
+};
