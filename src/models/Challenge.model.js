@@ -2,8 +2,6 @@ module.exports = (sequelize, DataTypes) => {
     const Challenge = sequelize.define("challenge", {
         title: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: { notNull: { msg: "Title can not be empty!" } }
         },
         description: {
             type: DataTypes.STRING
@@ -14,8 +12,23 @@ module.exports = (sequelize, DataTypes) => {
         date_end: {
             type: DataTypes.DATE
         },
-        scheme: {
+        img: {
             type: DataTypes.STRING
+        },
+        rules: {
+            type: DataTypes.STRING
+        },
+        id_user: {
+            type: DataTypes.INTEGER
+        },
+        id_area: {
+            type: DataTypes.INTEGER
+        },
+        id_category: {
+            type: DataTypes.INTEGER
+        },
+        id_state: {
+            type: DataTypes.INTEGER
         },
     }, {
         timestamps: false

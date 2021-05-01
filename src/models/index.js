@@ -24,9 +24,22 @@ sequelize.authenticate()
 
 
 const db = {};
-db.sequelize = sequelize; //export the Sequelize instance (actual connection pool)
+db.sequelize = sequelize;
 
-//export Challenge model (and add here any other models defined within the API)
+//export User model
+db.user = require("./User.model.js")(sequelize, DataTypes);
+
+//export Challenge model
 db.challenge = require("./Challenge.model.js")(sequelize, DataTypes);
+
+//export User model
+db.submission = require("./Submission.model.js")(sequelize, DataTypes);
+
+// //define the 1:N relationship
+// db.user.hasMany(db.submission);
+// db.submission.belongsTo(db.user)
+
+db.challenge.hasMany(db.submission, {foreignKey: 'id_challenge'});
+db.submission.belongsTo(db.challenge)
 
 module.exports = db;

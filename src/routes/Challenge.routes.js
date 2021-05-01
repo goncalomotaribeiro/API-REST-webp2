@@ -1,5 +1,5 @@
 const express = require('express');
-
+const submissionsRouter = require("./Submission.routes");
 const challengesController = require('../controllers/Challenge.controller');
 
 let router = express.Router();
@@ -17,14 +17,17 @@ router.route('/')
     .get(challengesController.findAll)
     .post(challengesController.create)
 
-// router.route('/published')
-//     .get(challengesController.findAllPublished)
-
+router.route('/submitted')
+    .get(challengesController.findAllWithSubmissions)
+    
 router.route('/:challengeID')
     .get(challengesController.findOne)
     .delete(challengesController.delete)
     .put(challengesController.update)
 
+
+// routes for challenge submissions
+router.use('/:challengeID/submissions', submissionsRouter);
 
 //send a predefined error message for invalid routes on CHALLENGES
 router.all('*', function (req, res) {
