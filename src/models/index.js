@@ -32,8 +32,11 @@ db.user = require("./User.model.js")(sequelize, DataTypes);
 //export Challenge model
 db.challenge = require("./Challenge.model.js")(sequelize, DataTypes);
 
-//export User model
+//export Submission model
 db.submission = require("./Submission.model.js")(sequelize, DataTypes);
+
+//export Event model
+db.event = require("./Event.model.js")(sequelize, DataTypes);
 
 db.challenge.hasMany(db.submission, {foreignKey: 'id_challenge'});
 db.submission.belongsTo(db.challenge, {foreignKey: 'id_challenge'})

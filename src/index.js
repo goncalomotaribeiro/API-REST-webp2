@@ -23,6 +23,9 @@ app.use('/challenges', require('./routes/Challenge.routes.js'))
 // routing middleware for resource SUBMISSIONS
 app.use('/submissions', require('./routes/Submission.routes.js'))
 
+// routing middleware for resource EVENTS
+app.use('/events', require('./routes/Event.routes.js'))
+
 // handle invalid routes
 app.get('*', function (req, res) {
     res.status(404).json({ message: 'WHAT???' });
