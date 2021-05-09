@@ -2,6 +2,8 @@
 const db = require('../models/index.js');
 const User = db.user;
 const Submission = db.submission
+const Challenge = db.challenge
+const Event = db.event
 const {Op} = require('sequelize')
 
 const getPagination = (page, size) => {
@@ -44,7 +46,18 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    User.findAndCountAll({ where: condition, limit, offset, include: Submission})
+    User.findAndCountAll({ where: condition, limit, offset, 
+        include: [
+            {
+                model: Challenge, attributes: ["id", "title"]
+            },
+            {
+                model: Event, attributes: ["id", "title"]
+            },
+            {
+                model: Submission, attributes: ["id", "url", "date", "id_user"]
+            }
+        ]})
         .then(data => {
             const response = getPagingData(data, page, limit);
             res.status(200).json(response);

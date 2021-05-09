@@ -1,9 +1,10 @@
 const db = require('../models/index.js');
 const Challenge = db.challenge;
 const Submission = db.submission
+const User = db.user
 
 //necessary for LIKE operator
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 
 const getPagination = (page, size) => {
     const limit = size ? size : 3; // limit = size (default is 3)
@@ -13,10 +14,10 @@ const getPagination = (page, size) => {
 
 const getPagingData = (data, page, limit) => {
     const totalItems = data.count;
-    const tutorials = data.rows;
+    const challenges = data.rows;
     const currentPage = page;
     const totalPages = Math.ceil(totalItems / limit);
-    return { totalItems, tutorials, totalPages, currentPage };
+    return { totalItems, challenges, totalPages, currentPage };
 };
 
 // Display all Challenges
@@ -44,7 +45,15 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    Challenge.findAndCountAll({ where: condition, limit, offset, include: Submission})
+    Challenge.findAndCountAll({ attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'rules', 'id_area', 'id_category', 'id_state'], where: condition, limit, offset, 
+        include: [
+            {
+                model: User, attributes: ["id", "username", "email"]
+            },
+            {
+                model: Submission, attributes: ["id", "url", "date"]
+            }
+        ]})
         .then(data => {
             const response = getPagingData(data, offset, limit);
             res.status(200).json(response);
@@ -75,7 +84,15 @@ exports.create = (req, res) => {
 
 // List just one Challenge
 exports.findOne = (req, res) => {
-    Challenge.findByPk(req.params.challengeID)
+    Challenge.findOne({where: {id: req.params.challengeID} , attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'rules', 'id_area', 'id_category', 'id_state'],
+    include: [
+        {
+            model: User, attributes: ["id", "username", "email"]
+        },
+        {
+            model: Submission, attributes: ["id", "url", "date"]
+        }
+    ]})
         .then(data => {
             if (data === null)
                 res.status(404).json({

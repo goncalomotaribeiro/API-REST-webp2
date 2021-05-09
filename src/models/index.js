@@ -44,6 +44,12 @@ db.topic = require("./Topic.model.js")(sequelize, DataTypes);
 //export Comment model
 db.comment = require("./Comment.model.js")(sequelize, DataTypes);
 
+db.user.hasMany(db.challenge, {foreignKey: 'id_user'});
+db.challenge.belongsTo(db.user, {foreignKey: 'id_user'})
+
+db.user.hasMany(db.event, {foreignKey: 'id_user'});
+db.event.belongsTo(db.user, {foreignKey: 'id_user'})
+
 db.challenge.hasMany(db.submission, {foreignKey: 'id_challenge'});
 db.submission.belongsTo(db.challenge, {foreignKey: 'id_challenge'})
 
