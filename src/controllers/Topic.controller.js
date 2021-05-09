@@ -1,6 +1,7 @@
 const db = require('../models/index.js');
 const Topic = db.topic;
 const Comment = db.comment
+const User = db.user
 
 //necessary for LIKE operator
 const { Op } = require('sequelize');
@@ -44,7 +45,15 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    Topic.findAndCountAll({ where: condition, limit, offset, include: Comment})
+    Topic.findAndCountAll({ attributes: ['id', 'title', 'text', 'date', 'id_category', 'id_state'], where: condition, limit, offset,
+    include: [
+        {
+            model: User, attributes: ["id", "username", "email"]
+        },
+        {
+            model: Comment, attributes: ["id", "comment", "date", "id_user"]
+        }
+    ]})
         .then(data => {
             const response = getPagingData(data, offset, limit);
             res.status(200).json(response);

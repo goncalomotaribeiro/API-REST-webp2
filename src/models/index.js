@@ -56,6 +56,12 @@ db.submission.belongsTo(db.challenge, {foreignKey: 'id_challenge'})
 db.user.hasMany(db.submission, {foreignKey: 'id_user'});
 db.submission.belongsTo(db.user, {foreignKey: 'id_user'})
 
+db.user.hasMany(db.topic, {foreignKey: 'id_user'});
+db.topic.belongsTo(db.user, {foreignKey: 'id_user'})
+
+db.user.hasMany(db.comment, {foreignKey: 'id_user'});
+db.comment.belongsTo(db.user, {foreignKey: 'id_user'})
+
 db.topic.hasMany(db.comment, {foreignKey: 'id_topic'});
 db.comment.belongsTo(db.topic, {foreignKey: 'id_topic'})
 
