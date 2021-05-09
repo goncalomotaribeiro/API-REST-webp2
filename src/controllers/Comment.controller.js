@@ -1,6 +1,8 @@
 const db = require("../models/index.js");
 const Comment = db.comment;
 const { Op } = require('sequelize')
+const User = db.user
+const Topic = db.topic
 
 const getPagination = (page, size) => {
     const limit = size ? parseInt(size) : 3; // limit = size (default is 3)
@@ -49,8 +51,15 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    Comment.findAndCountAll({attributes: ['id','comment', 'date', 'id_user', 'id_topic']
-        , where: condition, limit, offset})
+    Comment.findAndCountAll({attributes: ['id','comment', 'date'], where: condition, limit, offset, 
+    include: [
+        {
+            model: User, attributes: ["id", "username", "email"]
+        },
+        {
+            model: Topic, attributes: ["id", "title"]
+        }
+    ]})
 
         .then(data => {
             const response = getPagingData(data, page, limit);
