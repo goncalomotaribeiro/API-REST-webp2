@@ -4,7 +4,7 @@ const User = db.user;
 const Submission = db.submission
 const Challenge = db.challenge
 const Event = db.event
-const {Op} = require('sequelize')
+const { Op } = require('sequelize')
 
 const getPagination = (page, size) => {
     const limit = size ? parseInt(size) : 3; // limit = size (default is 3)
@@ -13,11 +13,11 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-    const totalItems = data.count; 
+    const totalItems = data.count;
     const users = data.rows;
-    const currentPage = page ;
+    const currentPage = page;
     const totalPages = Math.ceil(totalItems / limit);
- 
+
     return { totalItems, users, totalPages, currentPage };
 };
 
@@ -35,7 +35,7 @@ exports.findAll = (req, res) => {
     }
     else
         page = parseInt(page);
-    
+
     // validate size
     if (size && !req.query.size.match(/^([1-9]\d*)$/g)) {
         res.status(400).json({ message: 'Size must be a positive integer' });
@@ -46,7 +46,8 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    User.findAndCountAll({ where: condition, limit, offset, 
+    User.findAndCountAll({
+        where: condition, limit, offset,
         include: [
             {
                 model: Challenge, attributes: ["id", "title"]
@@ -57,7 +58,8 @@ exports.findAll = (req, res) => {
             {
                 model: Submission, attributes: ["id", "url", "date", "id_user"]
             }
-        ]})
+        ]
+    })
         .then(data => {
             const response = getPagingData(data, page, limit);
             res.status(200).json(response);
@@ -71,19 +73,27 @@ exports.findAll = (req, res) => {
 };
 
 // Handle user creation on POST
-exports.create = (req, res) => {
-    User.create(req.body)
-        .then(data => {
-            res.status(201).json({ message: "New user created.", location: "/users/" + data.id });
-        })
-        .catch(err => {
-            if (err.name === 'SequelizeValidationError')
-                res.status(400).json({message: err.errors[0].message});
-            else
-                res.status(500).json({
-                    message: err.message || "Some error occurred while creating the user."
-                });
-        });
+exports.create = async (req, res) => {
+    const users = await User.findAll();
+
+    if (users.find(user => user.username == req.body.username)) {
+        res.status(400).json({ message: 'Username already exists' });
+    } else if (users.find(user => user.email == req.body.email)) {
+        res.status(400).json({ message: 'Email already associated with account' });
+    }else {
+        User.create(req.body)
+            .then(data => {
+                res.status(201).json({ message: "New user created.", location: "/users/" + data.id });
+            })
+            .catch(err => {
+                if (err.name === 'SequelizeValidationError')
+                    res.status(400).json({ message: err.errors[0].message });
+                else
+                    res.status(500).json({
+                        message: err.message || "Some error occurred while creating the user."
+                    });
+            });
+    }
 };
 
 // List just one user
@@ -95,7 +105,7 @@ exports.findOne = (req, res) => {
                     message: `Not found user with id ${req.params.userID}.`
                 });
             else
-                res.json(data); 
+                res.json(data);
         })
         .catch(err => {
             res.status(500).json({
@@ -163,3 +173,32 @@ exports.findAllWithSubmissions = async (req, res) => {
         });
     };
 };
+
+
+// // Set user type
+// exports.setType = (req, res) => {
+//     if (req === "Admin") {
+//         User.update({ id_type: 1}, { where: { id: req.params.userID } })
+//     }else if (req === 2) {
+//         User.update({ id_type: 2}, { where: { id: req.params.userID } })
+//     } else if (req === "Teacher"){
+//         User.update({ id_type: 3}, { where: { id: req.params.userID } })
+//     }
+//     // User.update({ id_type: user_type}, { where: { id: req.params.userID } })
+//     //     // .then(num => {
+//     //     //     if (user_type == 1) {
+//     //     //         res.json({
+//     //     //             message: `User with id=${req.params.userID} type is Admin.`
+//     //     //         });
+//     //     //     } else  if (user_type == 3) {
+//     //     //         res.json({
+//     //     //             message: `User with id=${req.params.userID} type is Teacher.`
+//     //     //         });
+//     //     //     }
+//     //     // })
+//     //     .catch(err => {
+//     //         res.status(500).json({
+//     //             message: `Error setting user_type in user with id=${req.params.id}.`
+//     //         });
+//     //     });
+// };

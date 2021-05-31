@@ -46,7 +46,6 @@ exports.findAll = (req, res) => {
     } else
         size = parseInt(size);
 
-    // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
     Submission.findAndCountAll({attributes: ['id','url', 'date', 'id_user', 'id_challenge']
@@ -66,24 +65,29 @@ exports.findAll = (req, res) => {
 
 // Create one submission
 exports.createSubmission = async (req, res) => {
-    Submission.create({
-        url: req.body.url, date: req.body.date, 
-        id_user: req.body.id_user, id_challenge: req.params.challengeID
-    })
-        .then(data => {
-            res.status(201).json({
-                message: "New submission created.", location: "/challenges/" +
-                    req.params.challengeID + "/submissions/" + data.id
-            });
+    const submissions = await Submission.findAll();
+    if (submissions.find(submission => submission.id == req.body.id && submission.id_user == req.body.id_user)) {
+        res.status(400).json({ message: 'Submission already assigned' });
+    }else {
+        Submission.create({
+            url: req.body.url, date: req.body.date, 
+            id_user: req.body.id_user, id_challenge: req.params.challengeID
         })
-        .catch(err => {
-            if (err.name === 'SequelizeValidationError')
-                res.status(400).json({ message: err.errors[0].message });
-            else
-                res.status(500).json({
-                    message: err.message || "Some error occurred while creating the submission."
+            .then(data => {
+                res.status(201).json({
+                    message: "New submission created.", location: "/challenges/" +
+                        req.params.challengeID + "/submissions/" + data.id
                 });
-        });
+            })
+            .catch(err => {
+                if (err.name === 'SequelizeValidationError')
+                    res.status(400).json({ message: err.errors[0].message });
+                else
+                    res.status(500).json({
+                        message: err.message || "Some error occurred while creating the submission."
+                    });
+            });
+    }
 };
 
 // List just one submission

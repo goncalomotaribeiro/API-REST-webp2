@@ -29,6 +29,9 @@ db.sequelize = sequelize;
 //export User model
 db.user = require("./User.model.js")(sequelize, DataTypes);
 
+//export UserType model
+db.user_type = require("./UserType.model.js")(sequelize, DataTypes);
+
 //export Challenge model
 db.challenge = require("./Challenge.model.js")(sequelize, DataTypes);
 
@@ -43,6 +46,10 @@ db.topic = require("./Topic.model.js")(sequelize, DataTypes);
 
 //export Comment model
 db.comment = require("./Comment.model.js")(sequelize, DataTypes);
+
+
+db.user_type.hasMany(db.user, {foreignKey: 'id_type'});
+db.user.belongsTo(db.user_type, {foreignKey: 'id_type'})
 
 db.user.hasMany(db.challenge, {foreignKey: 'id_user'});
 db.challenge.belongsTo(db.user, {foreignKey: 'id_user'})

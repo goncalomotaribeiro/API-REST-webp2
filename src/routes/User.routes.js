@@ -1,4 +1,5 @@
 const express = require('express');
+const authController = require("../controllers/Auth.controller");
 const userController = require("../controllers/User.controller");
 
 // express router
@@ -15,14 +16,16 @@ router.use((req, res, next) => {
 })
 
 router.route('/')
-    .get(userController.findAll)
+    .get(authController.verifyToken, authController.isAdmin, userController.findAll)
+    // .get(userController.findAll)
     .post(userController.create);
 
 router.route('/submitted')
     .get(userController.findAllWithSubmissions)
 
 router.route('/:userID')
-    .get(userController.findOne)
+    // .get(userController.findOne)
+    .get(authController.verifyToken, authController.isAdminOrLoggedUser, userController.findOne)
     .put(userController.update)
     .delete(userController.delete);
 

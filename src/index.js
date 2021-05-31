@@ -14,6 +14,9 @@ app.get('/', function (req, res) {
     res.status(200).json({ message: 'home -- WEBP2 api' });
 });
 
+// routing middleware for resource AUTHENTICATION
+app.use('/auth', require('./routes/Auth.routes.js'))
+
 // routing middleware for resource USERS
 app.use('/users', require('./routes/User.routes.js'))
 
