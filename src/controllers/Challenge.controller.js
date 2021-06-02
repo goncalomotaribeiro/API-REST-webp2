@@ -68,7 +68,18 @@ exports.findAll = (req, res) => {
 
 // Challenge creation
 exports.create = (req, res) => {
-    Challenge.create(req.body)
+    Challenge.create({
+        title: req.body.title, 
+        description: req.body.description, 
+        date_ini: req.body.date_ini,
+        date_end: req.body.date_end,
+        img: req.body.img,
+        rules: req.body.rules,
+        id_user: req.loggedUserId,
+        id_area: req.body.id_area,
+        id_category: req.body.id_category,
+        id_state: req.body.id_state,
+    })
         .then(data => {
             res.status(201).json({ message: "New challenge created.", location: "/challenges/" + data.id });
         })

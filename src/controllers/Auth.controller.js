@@ -37,7 +37,7 @@ exports.signup = async (req, res) => {
             let user_type = await UserType.findOne({ where: { type: req.body.user_type } });
             if (user_type) {
                 if (user_type.type === "Admin") {
-                    await User.update({ id_type: 1 }, { where: { id: user.id } }).catch
+                    await User.update({ id_type: 1 }, { where: { id: user.id } })
                 } else if (user_type.type === "Teacher") {
                     await User.update({ id_type: 3 }, { where: { id: user.id } })
                 }
@@ -58,15 +58,15 @@ exports.signin = async (req, res) => {
         let user = await User.findOne({ where: { username: req.body.username } });
         if (!user) return res.status(404).json({ message: "User Not found." });
 
-        // // tests a string (password in body) against a hash (password in database)
-        // const passwordIsValid = bcrypt.compareSync(
-        //     req.body.password, user.password
-        // );
-        // if (!passwordIsValid) {
-        //     return res.status(401).json({
-        //         accessToken: null, message: "Invalid Password!"
-        //     });
-        // }
+        // tests a string (password in body) against a hash (password in database)
+        const passwordIsValid = bcrypt.compareSync(
+            req.body.password, user.password
+        );
+        if (!passwordIsValid) {
+            return res.status(401).json({
+                accessToken: null, message: "Invalid Password!"
+            });
+        }
 
         // sign the given payload (user ID) into a JWT payload – builds JWT token, using secret key
         const token = jwt.sign({ id: user.id }, config.secret, {
@@ -118,6 +118,20 @@ exports.isAdminOrLoggedUser = async (req, res, next) => {
     }else{
         return res.status(403).send({
             message: "Require Admin User Type!"
+        });
+    }
+};
+
+
+exports.isTeacher = async (req, res, next) => {
+    let user = await User.findByPk(req.loggedUserId);
+    let user_type = await UserType.findOne({ where: { id: user.id_type } });
+    if (user_type.type === "Teacher" || user_type.type === "Admin")
+    {
+        next();
+    }else{
+        return res.status(403).send({
+            message: "Require Teacher or Admin User Type!"
         });
     }
 };

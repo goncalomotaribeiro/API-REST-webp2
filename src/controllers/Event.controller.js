@@ -64,7 +64,18 @@ exports.findAll = (req, res) => {
 
 // Event creation
 exports.create = (req, res) => {
-    Event.create(req.body)
+    Event.create({
+        title: req.body.title, 
+        description: req.body.description, 
+        edition: req.body.edition,
+        date: req.body.date,
+        img: req.body.img,
+        url: req.body.url,
+        id_user: req.loggedUserId,
+        id_area: req.body.id_area,
+        id_category: req.body.id_category,
+        id_state: req.body.id_state,
+    })
         .then(data => {
             res.status(201).json({ message: "New event created.", location: "/events/" + data.id });
         })

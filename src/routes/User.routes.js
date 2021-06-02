@@ -17,17 +17,14 @@ router.use((req, res, next) => {
 
 router.route('/')
     .get(authController.verifyToken, authController.isAdmin, userController.findAll)
-    // .get(userController.findAll)
-    .post(userController.create);
 
 router.route('/submitted')
-    .get(userController.findAllWithSubmissions)
+    .get(authController.verifyToken, authController.isTeacher, userController.findAllWithSubmissions)
 
 router.route('/:userID')
-    // .get(userController.findOne)
     .get(authController.verifyToken, authController.isAdminOrLoggedUser, userController.findOne)
-    .put(userController.update)
-    .delete(userController.delete);
+    .put(authController.verifyToken, authController.isAdminOrLoggedUser, userController.update)
+    .delete(authController.verifyToken, authController.isAdminOrLoggedUser, userController.delete);
 
 router.all('*', function (req, res) {
     res.status(404).json({ message: 'USERS: invalid request' });

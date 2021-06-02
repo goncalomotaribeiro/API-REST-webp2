@@ -1,5 +1,5 @@
 const express = require('express');
-// const submissionsRouter = require("./Submission.routes");
+const authController = require("../controllers/Auth.controller");
 const eventsController = require('../controllers/Event.controller');
 
 let router = express.Router();
@@ -15,19 +15,12 @@ router.use((req, res, next) => {
 
 router.route('/')
     .get(eventsController.findAll)
-    .post(eventsController.create)
-
-// router.route('/submitted')
-//     .get(eventsController.findAllWithSubmissions)
+    .post(authController.verifyToken, authController.isTeacher, eventsController.create)
     
 router.route('/:eventID')
     .get(eventsController.findOne)
-    .delete(eventsController.delete)
-    .put(eventsController.update)
-
-
-// // routes for event submissions
-// router.use('/:eventID/submissions', submissionsRouter);
+    .delete(authController.verifyToken, authController.isTeacher, eventsController.delete)
+    .put(authController.verifyToken, authController.isTeacher, eventsController.update)
 
 //send a predefined error message for invalid routes on EVENTS
 router.all('*', function (req, res) {

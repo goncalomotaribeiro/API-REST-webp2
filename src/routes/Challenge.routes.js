@@ -1,5 +1,6 @@
 const express = require('express');
 const submissionsRouter = require("./Submission.routes");
+const authController = require("../controllers/Auth.controller");
 const challengesController = require('../controllers/Challenge.controller');
 
 let router = express.Router();
@@ -15,15 +16,15 @@ router.use((req, res, next) => {
 
 router.route('/')
     .get(challengesController.findAll)
-    .post(challengesController.create)
+    .post(authController.verifyToken, authController.isTeacher, challengesController.create)
 
 router.route('/submitted')
-    .get(challengesController.findAllWithSubmissions)
+    .get(authController.verifyToken, authController.isAdmin, challengesController.findAllWithSubmissions)
     
 router.route('/:challengeID')
     .get(challengesController.findOne)
-    .delete(challengesController.delete)
-    .put(challengesController.update)
+    .delete(authController.verifyToken, authController.isTeacher, challengesController.delete)
+    .put(authController.verifyToken, authController.isTeacher, challengesController.update)
 
 
 // routes for challenge submissions
