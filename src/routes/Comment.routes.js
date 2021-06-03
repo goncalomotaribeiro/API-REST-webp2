@@ -1,4 +1,5 @@
 const express = require('express');
+const authController = require("../controllers/Auth.controller");
 const commentController = require("../controllers/Comment.controller");
 
 let router = express.Router({ mergeParams: true });
@@ -14,13 +15,13 @@ router.use((req, res, next) => {
 })
 
 router.route('/')
-    .get(commentController.findAll)
-    .post(commentController.createComment);
+    .get(authController.verifyToken, commentController.findAll)
+    .post(authController.verifyToken, commentController.createComment);
 
 router.route('/:commentID')
-    .get(commentController.findOne)
-    .put(commentController.update)
-    .delete(commentController.delete);
+    .get(authController.verifyToken, commentController.findOne)
+    .put(authController.verifyToken, commentController.update)
+    .delete(authController.verifyToken, commentController.delete);
 
 router.all('*', function (req, res) {
     //send an predefined error message 

@@ -1,4 +1,5 @@
 const express = require('express');
+const authController = require("../controllers/Auth.controller");
 const submissionController = require("../controllers/Submission.controller");
 
 let router = express.Router({ mergeParams: true });
@@ -14,13 +15,13 @@ router.use((req, res, next) => {
 })
 
 router.route('/')
-    .get(submissionController.findAll)
-    .post(submissionController.createSubmission);
+    .get(authController.verifyToken, authController.isTeacher, submissionController.findAll)
+    .post(authController.verifyToken, submissionController.createSubmission);
 
 router.route('/:submissionID')
-    .get(submissionController.findOne)
-    .put(submissionController.update)
-    .delete(submissionController.delete);
+    .get(authController.verifyToken, submissionController.findOne)
+    .put(authController.verifyToken, submissionController.update)
+    .delete(authController.verifyToken, submissionController.delete);
 
 router.all('*', function (req, res) {
     //send an predefined error message 

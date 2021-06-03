@@ -132,43 +132,67 @@ exports.findOne = (req, res) => {
 };
 
 // Update Event
-exports.update = (req, res) => {
-    Event.update(req.body, { where: { id: req.params.eventID } })
-        .then(num => {
-            if (num == 1) {
-                res.json({
-                    message: `Event with id=${req.params.eventID} was updated successfully.`
+exports.update = async (req, res) => {
+    let event = await Challenge.findOne({ where: { id: req.params.eventID } })
+    let user = await User.findOne({ where: { id: req.loggedUserId } })
+
+    if (!event)
+        return res.status(404).json({ message: `Not found event with id=${req.params.eventID}.` });
+
+    if (event.id_user == req.loggedUserId || user.id_type == 1) {
+        Event.update(req.body, { where: { id: req.params.eventID } })
+            .then(num => {
+                if (num == 1) {
+                    res.json({
+                        message: `Event with id=${req.params.eventID} was updated successfully.`
+                    });
+                } else {
+                    res.status(404).json({
+                        message: `Not found event with id=${req.params.eventID}.`
+                    });
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: `Error updating event with id=${req.params.eventID}.`
                 });
-            } else {
-                res.status(404).json({
-                    message: `Not found event with id=${req.params.eventID}.`
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: `Error updating event with id=${req.params.id}.`
             });
+    } else {
+        res.json({
+            message: `Can't update event.`
         });
+    }
 };
 
 // Delete Event
-exports.delete = (req, res) => {
-    Event.destroy({ where: { id: req.params.eventID } })
-        .then(num => {
-            if (num == 1) {
-                res.status(200).json({
-                    message: `Event with id ${req.params.eventID} was successfully deleted!`
+exports.delete = async (req, res) => {
+    let event = await Challenge.findOne({ where: { id: req.params.eventID } })
+    let user = await User.findOne({ where: { id: req.loggedUserId } })
+
+    if (!event)
+        return res.status(404).json({ message: `Not found event with id=${req.params.eventID}.` });
+
+    if (event.id_user == req.loggedUserId || user.id_type == 1) {
+        Event.destroy({ where: { id: req.params.eventID } })
+            .then(num => {
+                if (num == 1) {
+                    res.status(200).json({
+                        message: `Event with id ${req.params.eventID} was successfully deleted!`
+                    });
+                } else {
+                    res.status(404).json({
+                        message: `Not found event with id=${req.params.eventID}.`
+                    });
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: `Error deleting event with id=${req.params.eventID}.`
                 });
-            } else {
-                res.status(404).json({
-                    message: `Not found event with id=${req.params.eventID}.`
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: `Error deleting event with id=${req.params.eventID}.`
             });
+    } else {
+        res.json({
+            message: `Can't delete event.`
         });
+    }
 };
