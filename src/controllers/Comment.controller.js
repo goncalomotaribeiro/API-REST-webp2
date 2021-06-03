@@ -77,7 +77,7 @@ exports.findAll = (req, res) => {
 exports.createComment = async (req, res) => {
     Comment.create({
         comment: req.body.comment, date: req.body.date, 
-        id_user: req.body.id_user, id_topic: req.params.topicID
+        id_user: req.loggedUserId, id_topic: req.params.topicID
     })
         .then(data => {
             res.status(201).json({

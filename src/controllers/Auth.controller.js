@@ -111,6 +111,7 @@ exports.isAdmin = async (req, res, next) => {
 };
 
 exports.isAdminOrLoggedUser = async (req, res, next) => {
+    console.log(req);
     let user = await User.findByPk(req.loggedUserId);
     let user_type = await UserType.findOne({ where: { id: user.id_type } });
     if (user_type.type === "Admin" || (user.id == req.params.userID)){

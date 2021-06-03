@@ -71,7 +71,7 @@ exports.createSubmission = async (req, res) => {
     }else {
         Submission.create({
             url: req.body.url, date: req.body.date, 
-            id_user: req.body.id_user, id_challenge: req.params.challengeID
+            id_user: req.loggedUserId, id_challenge: req.params.challengeID
         })
             .then(data => {
                 res.status(201).json({

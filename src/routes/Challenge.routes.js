@@ -15,14 +15,14 @@ router.use((req, res, next) => {
 })
 
 router.route('/')
-    .get(challengesController.findAll)
+    .get(authController.verifyToken, challengesController.findAll)
     .post(authController.verifyToken, authController.isTeacher, challengesController.create)
 
 router.route('/submitted')
     .get(authController.verifyToken, authController.isAdmin, challengesController.findAllWithSubmissions)
     
 router.route('/:challengeID')
-    .get(challengesController.findOne)
+    .get(authController.verifyToken, challengesController.findOne)
     .delete(authController.verifyToken, authController.isTeacher, challengesController.delete)
     .put(authController.verifyToken, authController.isTeacher, challengesController.update)
 

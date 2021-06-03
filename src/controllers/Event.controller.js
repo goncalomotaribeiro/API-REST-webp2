@@ -33,7 +33,7 @@ exports.findAll = (req, res) => {
     }
     else
         page = parseInt(page);
-    
+
     // validate size
     if (size && !req.query.size.match(/^([1-9]\d*)$/g)) {
         res.status(400).json({ message: 'Size must be a positive integer' });
@@ -44,12 +44,14 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    Event.findAndCountAll({ attributes: ['id', 'title', 'description', 'edition', 'date', 'url', 'id_area', 'id_category', 'id_state'], where: condition, limit, offset,
+    Event.findAndCountAll({
+        attributes: ['id', 'title', 'description', 'edition', 'date', 'url', 'id_area', 'id_category', 'id_state'], where: condition, limit, offset,
         include: [
             {
                 model: User, attributes: ["id", "username", "email"]
             }
-        ]})
+        ]
+    })
         .then(data => {
             const response = getPagingData(data, offset, limit);
             res.status(200).json(response);
@@ -63,10 +65,25 @@ exports.findAll = (req, res) => {
 };
 
 // Event creation
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
+
+    // check duplicate event
+    let event = await Event.findOne(
+        {
+            where: {
+                [Op.and]: [
+                    { title: req.body.title },
+                    { edition: req.body.edition }
+                ]
+            }
+        }
+    );
+    if (event)
+        return res.status(400).json({ message: "Event already exists!" });
+
     Event.create({
-        title: req.body.title, 
-        description: req.body.description, 
+        title: req.body.title,
+        description: req.body.description,
         edition: req.body.edition,
         date: req.body.date,
         img: req.body.img,
@@ -91,14 +108,21 @@ exports.create = (req, res) => {
 
 // List just one Event
 exports.findOne = (req, res) => {
-    Event.findByPk(req.params.eventID)
+    Event.findByPk(req.params.eventID, {
+        attributes: ['id', 'title', 'description', 'edition', 'date', 'url', 'id_area', 'id_category', 'id_state'],
+        include: [
+            {
+                model: User, attributes: ["id", "username", "email"]
+            }
+        ]
+    })
         .then(data => {
             if (data === null)
                 res.status(404).json({
                     message: `Not found event with id ${req.params.eventID}.`
                 });
             else
-                res.json(data); 
+                res.json(data);
         })
         .catch(err => {
             res.status(500).json({

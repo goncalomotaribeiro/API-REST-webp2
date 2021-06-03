@@ -14,11 +14,11 @@ router.use((req, res, next) => {
 })
 
 router.route('/')
-    .get(eventsController.findAll)
+    .get(authController.verifyToken, eventsController.findAll)
     .post(authController.verifyToken, authController.isTeacher, eventsController.create)
     
 router.route('/:eventID')
-    .get(eventsController.findOne)
+    .get(authController.verifyToken, eventsController.findOne)
     .delete(authController.verifyToken, authController.isTeacher, eventsController.delete)
     .put(authController.verifyToken, authController.isTeacher, eventsController.update)
 

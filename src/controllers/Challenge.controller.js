@@ -34,7 +34,7 @@ exports.findAll = (req, res) => {
     }
     else
         page = parseInt(page);
-    
+
     // validate size
     if (size && !req.query.size.match(/^([1-9]\d*)$/g)) {
         res.status(400).json({ message: 'Size must be a positive integer' });
@@ -45,7 +45,8 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    Challenge.findAndCountAll({ attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'rules', 'id_area', 'id_category', 'id_state'], where: condition, limit, offset, 
+    Challenge.findAndCountAll({
+        attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'rules', 'id_area', 'id_category', 'id_state'], where: condition, limit, offset,
         include: [
             {
                 model: User, attributes: ["id", "username", "email"]
@@ -53,7 +54,8 @@ exports.findAll = (req, res) => {
             {
                 model: Submission, attributes: ["id", "url", "date"]
             }
-        ]})
+        ]
+    })
         .then(data => {
             const response = getPagingData(data, offset, limit);
             res.status(200).json(response);
@@ -67,10 +69,22 @@ exports.findAll = (req, res) => {
 };
 
 // Challenge creation
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
+
+    // check duplicate title
+    let challenge = await Challenge.findOne(
+        {
+            where: {
+                title: req.body.title
+            }
+        }
+    );
+    if (challenge)
+        return res.status(400).json({ message: "Title is already in use!" });
+
     Challenge.create({
-        title: req.body.title, 
-        description: req.body.description, 
+        title: req.body.title,
+        description: req.body.description,
         date_ini: req.body.date_ini,
         date_end: req.body.date_end,
         img: req.body.img,
@@ -95,22 +109,24 @@ exports.create = (req, res) => {
 
 // List just one Challenge
 exports.findOne = (req, res) => {
-    Challenge.findOne({where: {id: req.params.challengeID} , attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'rules', 'id_area', 'id_category', 'id_state'],
-    include: [
-        {
-            model: User, attributes: ["id", "username", "email"]
-        },
-        {
-            model: Submission, attributes: ["id", "url", "date"]
-        }
-    ]})
+    Challenge.findOne({
+        where: { id: req.params.challengeID }, attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'rules', 'id_area', 'id_category', 'id_state'],
+        include: [
+            {
+                model: User, attributes: ["id", "username", "email"]
+            },
+            {
+                model: Submission, attributes: ["id", "url", "date"]
+            }
+        ]
+    })
         .then(data => {
             if (data === null)
                 res.status(404).json({
                     message: `Not found challenge with id ${req.params.challengeID}.`
                 });
             else
-                res.json(data); 
+                res.json(data);
         })
         .catch(err => {
             res.status(500).json({
@@ -120,45 +136,69 @@ exports.findOne = (req, res) => {
 };
 
 // Update Challenge
-exports.update = (req, res) => {
-    Challenge.update(req.body, { where: { id: req.params.challengeID } })
-        .then(num => {
-            if (num == 1) {
-                res.json({
-                    message: `Challenge with id=${req.params.challengeID} was updated successfully.`
+exports.update = async (req, res) => {
+    let challenge = await Challenge.findOne({ where: { id: req.params.challengeID } })
+    let user = await User.findOne({ where: { id: req.loggedUserId } })
+
+    if (!challenge)
+        return res.status(404).json({ message: `Not found challenge with id=${req.params.challengeID}.` });
+
+    if (challenge.id_user == req.loggedUserId || user.id_type == 1) {
+        Challenge.update(req.body, { where: { id: req.params.challengeID } })
+            .then(num => {
+                if (num == 1) {
+                    res.json({
+                        message: `Challenge with id=${req.params.challengeID} was updated successfully.`
+                    });
+                } else {
+                    res.status(404).json({
+                        message: `Not found challenge with id=${req.params.challengeID}.`
+                    });
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: `Error updating challenge with id=${req.params.challengeID}.`
                 });
-            } else {
-                res.status(404).json({
-                    message: `Not found challenge with id=${req.params.challengeID}.`
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: `Error updating challenge with id=${req.params.id}.`
             });
+    } else {
+        res.json({
+            message: `Can't update challenge.`
         });
+    }
 };
 
 // Delete Challenge
-exports.delete = (req, res) => {
-    Challenge.destroy({ where: { id: req.params.challengeID } })
-        .then(num => {
-            if (num == 1) {
-                res.status(200).json({
-                    message: `Challenge with id ${req.params.challengeID} was successfully deleted!`
+exports.delete = async (req, res) => {
+    let challenge = await Challenge.findOne({ where: { id: req.params.challengeID } })
+    let user = await User.findOne({ where: { id: req.loggedUserId } })
+
+    if (!challenge)
+        return res.status(404).json({ message: `Not found challenge with id=${req.params.challengeID}.` });
+
+    if (challenge.id_user == req.loggedUserId || user.id_type == 1) {
+        Challenge.destroy({ where: { id: req.params.challengeID } })
+            .then(num => {
+                if (num == 1) {
+                    res.status(200).json({
+                        message: `Challenge with id ${req.params.challengeID} was successfully deleted!`
+                    });
+                } else {
+                    res.status(404).json({
+                        message: `Not found challenge with id=${req.params.challengeID}.`
+                    });
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: `Error deleting challenge with id=${req.params.challengeID}.`
                 });
-            } else {
-                res.status(404).json({
-                    message: `Not found challenge with id=${req.params.challengeID}.`
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: `Error deleting challenge with id=${req.params.challengeID}.`
             });
+    } else {
+        res.json({
+            message: `Can't delete challenge.`
         });
+    }
 };
 
 // Display list of all challenges with submissions

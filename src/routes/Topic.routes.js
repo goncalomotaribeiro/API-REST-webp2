@@ -1,5 +1,6 @@
 const express = require('express');
 const commentsRouter = require("./Comment.routes");
+const authController = require("../controllers/Auth.controller");
 const topicsController = require('../controllers/Topic.controller');
 
 let router = express.Router();
@@ -14,16 +15,16 @@ router.use((req, res, next) => {
 })
 
 router.route('/')
-    .get(topicsController.findAll)
-    .post(topicsController.create)
+    .get(authController.verifyToken, topicsController.findAll)
+    .post(authController.verifyToken, topicsController.create)
 
 router.route('/commented')
-    .get(topicsController.findAllCommented)
+    .get(authController.verifyToken, authController.isAdmin, topicsController.findAllCommented)
     
 router.route('/:topicID')
-    .get(topicsController.findOne)
-    .delete(topicsController.delete)
-    .put(topicsController.update)
+    .get(authController.verifyToken, topicsController.findOne)
+    .delete(authController.verifyToken, topicsController.delete)
+    .put(authController.verifyToken, topicsController.update)
 
 
 // routes for topic comments

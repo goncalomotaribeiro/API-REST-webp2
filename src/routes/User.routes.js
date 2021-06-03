@@ -19,7 +19,7 @@ router.route('/')
     .get(authController.verifyToken, authController.isAdmin, userController.findAll)
 
 router.route('/submitted')
-    .get(authController.verifyToken, authController.isTeacher, userController.findAllWithSubmissions)
+    .get(authController.verifyToken, authController.isAdmin, userController.findAllWithSubmissions)
 
 router.route('/:userID')
     .get(authController.verifyToken, authController.isAdminOrLoggedUser, userController.findOne)
