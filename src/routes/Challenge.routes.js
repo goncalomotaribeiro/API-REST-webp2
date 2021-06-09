@@ -24,7 +24,7 @@ router.route('/submitted')
 router.route('/:challengeID')
     .get(authController.verifyToken, challengesController.findOne)
     .delete(authController.verifyToken, authController.isTeacher, challengesController.delete)
-    .put(authController.verifyToken, authController.isTeacher, challengesController.update)
+    .put(challengesController.update)
 
 
 // routes for challenge submissions

@@ -113,7 +113,7 @@ exports.findOne = (req, res) => {
 
 // Update one submission
 exports.update = async (req, res) => {
-    let submission = await Challenge.findOne({ where: { id: req.params.submissionID } })
+    let submission = await Submission.findOne({ where: { id: req.params.submissionID } })
     let user = await User.findOne({ where: { id: req.loggedUserId } })
 
     if (!submission)
@@ -147,7 +147,7 @@ exports.update = async (req, res) => {
 
 // Delete one submission
 exports.delete = async (req, res) => {
-    let submission = await Challenge.findOne({ where: { id: req.params.submissionID } })
+    let submission = await Submission.findOne({ where: { id: req.params.submissionID } })
     let user = await User.findOne({ where: { id: req.loggedUserId } })
 
     if (!submission)

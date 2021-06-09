@@ -117,7 +117,7 @@ exports.findOne = (req, res) => {
 
 // Update one comment
 exports.update = async (req, res) => {
-    let comment = await Challenge.findOne({ where: { id: req.params.commentID } })
+    let comment = await Comment.findOne({ where: { id: req.params.commentID } })
     let user = await User.findOne({ where: { id: req.loggedUserId } })
 
     if (!comment)
@@ -151,7 +151,7 @@ exports.update = async (req, res) => {
 
 // Delete one comment
 exports.delete = async (req, res) => {
-    let comment = await Challenge.findOne({ where: { id: req.params.commentID } })
+    let comment = await Comment.findOne({ where: { id: req.params.commentID } })
     let user = await User.findOne({ where: { id: req.loggedUserId } })
 
     if (!comment)

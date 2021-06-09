@@ -13,7 +13,7 @@ exports.signup = async (req, res) => {
             { where: { username: req.body.username } }
         );
         if (user)
-            return res.status(400).json({ message: "Username is already in use!" });
+            return res.status(400).json({ message: "Username already taken!" });
 
         // check duplicate email
         user = await User.findOne(
@@ -31,7 +31,11 @@ exports.signup = async (req, res) => {
             biography: req.body.biography,
             location: req.body.location,
             url: req.body.url,
-            profile_picture: req.body.profile_picture
+            profile_picture: req.body.profile_picture,
+            points: 0,
+            following: 0,
+            followers: 0,
+            id_level: 1
         });
         if (req.body.user_type) {
             let user_type = await UserType.findOne({ where: { type: req.body.user_type } });
@@ -56,7 +60,7 @@ exports.signin = async (req, res) => {
     try {
 
         let user = await User.findOne({ where: { username: req.body.username } });
-        if (!user) return res.status(404).json({ message: "User Not found." });
+        if (!user) return res.status(404).json({ message: "Username or password invalid!" });
 
         // tests a string (password in body) against a hash (password in database)
         const passwordIsValid = bcrypt.compareSync(
@@ -64,7 +68,7 @@ exports.signin = async (req, res) => {
         );
         if (!passwordIsValid) {
             return res.status(401).json({
-                accessToken: null, message: "Invalid Password!"
+                accessToken: null, message: "Username or password invalid!"
             });
         }
 
@@ -75,7 +79,7 @@ exports.signin = async (req, res) => {
         let user_type = await UserType.findOne({ where: { id: user.id_type } });
         return res.status(200).json({
             id: user.id, username: user.username,
-            email: user.email, user_type: user_type.type.toUpperCase(), accessToken: token
+            email: user.email, name: user.name, user_type: user_type.type.toUpperCase(), accessToken: token
         });
     } catch (err) { res.status(500).json({ message: err.message }); };
 };

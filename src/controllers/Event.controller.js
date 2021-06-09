@@ -1,6 +1,9 @@
 const db = require('../models/index.js');
 const Event = db.event;
 const User = db.user
+const ScientificArea = db.scientific_area
+const EventCategory = db.event_category
+const State = db.state
 
 //necessary for LIKE operator
 const { Op } = require('sequelize');
@@ -13,10 +16,10 @@ const getPagination = (page, size) => {
 
 const getPagingData = (data, page, limit) => {
     const totalItems = data.count;
-    const tutorials = data.rows;
+    const events = data.rows;
     const currentPage = page;
     const totalPages = Math.ceil(totalItems / limit);
-    return { totalItems, tutorials, totalPages, currentPage };
+    return { totalItems, events, totalPages, currentPage };
 };
 
 // Display all Events
@@ -45,10 +48,19 @@ exports.findAll = (req, res) => {
     const { limit, offset } = getPagination(page, size);
 
     Event.findAndCountAll({
-        attributes: ['id', 'title', 'description', 'edition', 'date', 'url', 'id_area', 'id_category', 'id_state'], where: condition, limit, offset,
+        attributes: ['id', 'title', 'description', 'edition', 'date', 'img', 'url', 'id_area', 'id_category'], where: condition, limit, offset,
         include: [
             {
                 model: User, attributes: ["id", "username", "email"]
+            },
+            {
+                model: ScientificArea
+            },
+            {
+                model: EventCategory
+            },
+            {
+                model: State
             }
         ]
     })
@@ -109,10 +121,19 @@ exports.create = async (req, res) => {
 // List just one Event
 exports.findOne = (req, res) => {
     Event.findByPk(req.params.eventID, {
-        attributes: ['id', 'title', 'description', 'edition', 'date', 'url', 'id_area', 'id_category', 'id_state'],
+        attributes: ['id', 'title', 'description', 'edition', 'date', 'img', 'url', 'id_area', 'id_category'],
         include: [
             {
                 model: User, attributes: ["id", "username", "email"]
+            },
+            {
+                model: ScientificArea
+            },
+            {
+                model: EventCategory
+            },
+            {
+                model: State
             }
         ]
     })
@@ -133,7 +154,8 @@ exports.findOne = (req, res) => {
 
 // Update Event
 exports.update = async (req, res) => {
-    let event = await Challenge.findOne({ where: { id: req.params.eventID } })
+    console.log(req.body);
+    let event = await Event.findOne({ where: { id: req.params.eventID } })
     let user = await User.findOne({ where: { id: req.loggedUserId } })
 
     if (!event)
@@ -166,7 +188,7 @@ exports.update = async (req, res) => {
 
 // Delete Event
 exports.delete = async (req, res) => {
-    let event = await Challenge.findOne({ where: { id: req.params.eventID } })
+    let event = await Event.findOne({ where: { id: req.params.eventID } })
     let user = await User.findOne({ where: { id: req.loggedUserId } })
 
     if (!event)

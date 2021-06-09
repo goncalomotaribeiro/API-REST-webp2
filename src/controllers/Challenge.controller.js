@@ -2,6 +2,9 @@ const db = require('../models/index.js');
 const Challenge = db.challenge;
 const Submission = db.submission
 const User = db.user
+const ScientificArea = db.scientific_area
+const ChallengeCategory = db.challenge_category
+const State = db.state
 
 //necessary for LIKE operator
 const { Op, where } = require('sequelize');
@@ -46,13 +49,22 @@ exports.findAll = (req, res) => {
     const { limit, offset } = getPagination(page, size);
 
     Challenge.findAndCountAll({
-        attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'rules', 'id_area', 'id_category', 'id_state'], where: condition, limit, offset,
+        attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'img', 'rules', 'id_area', 'id_category'], where: condition, limit, offset,
         include: [
             {
                 model: User, attributes: ["id", "username", "email"]
             },
             {
                 model: Submission, attributes: ["id", "url", "date"]
+            },
+            {
+                model: ScientificArea
+            },
+            {
+                model: ChallengeCategory
+            },
+            {
+                model: State
             }
         ]
     })
@@ -110,13 +122,22 @@ exports.create = async (req, res) => {
 // List just one Challenge
 exports.findOne = (req, res) => {
     Challenge.findOne({
-        where: { id: req.params.challengeID }, attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'rules', 'id_area', 'id_category', 'id_state'],
+        where: { id: req.params.challengeID }, attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'img', 'rules', 'id_area', 'id_category'],
         include: [
             {
                 model: User, attributes: ["id", "username", "email"]
             },
             {
                 model: Submission, attributes: ["id", "url", "date"]
+            },
+            {
+                model: ScientificArea
+            },
+            {
+                model: ChallengeCategory
+            },
+            {
+                model: State
             }
         ]
     })
@@ -137,35 +158,35 @@ exports.findOne = (req, res) => {
 
 // Update Challenge
 exports.update = async (req, res) => {
-    let challenge = await Challenge.findOne({ where: { id: req.params.challengeID } })
-    let user = await User.findOne({ where: { id: req.loggedUserId } })
+    // let challenge = await Challenge.findOne({ where: { id: req.params.challengeID } })
+    // let user = await User.findOne({ where: { id: req.loggedUserId } })
 
-    if (!challenge)
-        return res.status(404).json({ message: `Not found challenge with id=${req.params.challengeID}.` });
+    // if (!challenge)
+    //     return res.status(404).json({ message: `Not found challenge with id=${req.params.challengeID}.` });
 
-    if (challenge.id_user == req.loggedUserId || user.id_type == 1) {
-        Challenge.update(req.body, { where: { id: req.params.challengeID } })
-            .then(num => {
-                if (num == 1) {
-                    res.json({
-                        message: `Challenge with id=${req.params.challengeID} was updated successfully.`
-                    });
-                } else {
-                    res.status(404).json({
-                        message: `Not found challenge with id=${req.params.challengeID}.`
-                    });
-                }
-            })
-            .catch(err => {
-                res.status(500).json({
-                    message: `Error updating challenge with id=${req.params.challengeID}.`
+    // if (challenge.id_user == req.loggedUserId || user.id_type == 1) {
+    Challenge.update(req.body, { where: { id: req.params.challengeID } })
+        .then(num => {
+            if (num == 1) {
+                res.json({
+                    message: `Challenge with id=${req.params.challengeID} was updated successfully.`
                 });
+            } else {
+                res.status(404).json({
+                    message: `Not found challenge with id=${req.params.challengeID}.`
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: `Error updating challenge with id=${req.params.challengeID}.`
             });
-    } else {
-        res.json({
-            message: `Can't update challenge.`
         });
-    }
+    // } else {
+    //     res.json({
+    //         message: `Can't update challenge.`
+    //     });
+    // }
 };
 
 // Delete Challenge

@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
         date: {
             type: DataTypes.DATE
         },
-        // img: {
-        //     type: DataTypes.STRING
-        // },
+        img: {
+            type: DataTypes.BLOB
+        },
         url: {
             type: DataTypes.STRING
         },

@@ -4,6 +4,7 @@ const User = db.user;
 const Submission = db.submission
 const Challenge = db.challenge
 const Event = db.event
+const UserType = db.user_type
 const { Op } = require('sequelize')
 
 const getPagination = (page, size) => {
@@ -46,7 +47,7 @@ exports.findAll = (req, res) => {
     // convert page & size into limit & offset options for findAndCountAll
     const { limit, offset } = getPagination(page, size);
 
-    User.findAndCountAll({
+    User.findAndCountAll({ attributes: ['id', 'username', 'email', 'password', 'name', 'biography', 'location', 'url', 'profile_picture'],
         where: condition, limit, offset,
         include: [
             {
@@ -57,6 +58,9 @@ exports.findAll = (req, res) => {
             },
             {
                 model: Submission, attributes: ["id", "url", "date", "id_user"]
+            },
+            {
+                model: UserType, attributes: ["id", "type"]
             }
         ]
     })
@@ -104,7 +108,21 @@ exports.findOne = (req, res) => {
 };
 
 // Update one user
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
+    // check duplicate username
+    let user = await User.findOne(
+        { where: { username: req.body.username } }
+    );
+    if (user && req.params.userID != user.id)
+        return res.status(400).json({ message: "Username already taken!" });
+
+    // check duplicate email
+    user = await User.findOne(
+        { where: { email: req.body.email } }
+    );
+    if (user && req.params.userID != user.id)
+        return res.status(400).json({ message: "Email already associated with account!" });
+
     User.update(req.body, { where: { id: req.params.userID } })
         .then(num => {
             if (num == 1) {
