@@ -19,10 +19,9 @@
     "nodemon": "^2.0.7"
   },
   "scripts": {
-    "start": "node ./src/index.js",
-    "dev": "node ./src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "web": "node ./src/index.js"
+    "start": "nodemon src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
