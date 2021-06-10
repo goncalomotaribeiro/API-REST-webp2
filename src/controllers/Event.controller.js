@@ -51,7 +51,7 @@ exports.findAll = (req, res) => {
         attributes: ['id', 'title', 'description', 'edition', 'date', 'img', 'url', 'id_area', 'id_category'], where: condition, limit, offset,
         include: [
             {
-                model: User, attributes: ["id", "username", "email"]
+                model: User, attributes: ["id", "username", "email", "name", "id_type"]
             },
             {
                 model: ScientificArea
@@ -124,7 +124,7 @@ exports.findOne = (req, res) => {
         attributes: ['id', 'title', 'description', 'edition', 'date', 'img', 'url', 'id_area', 'id_category'],
         include: [
             {
-                model: User, attributes: ["id", "username", "email"]
+                model: User, attributes: ["id", "username", "email", "name", "id_type"]
             },
             {
                 model: ScientificArea

@@ -52,7 +52,7 @@ exports.findAll = (req, res) => {
         attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'img', 'rules', 'id_area', 'id_category'], where: condition, limit, offset,
         include: [
             {
-                model: User, attributes: ["id", "username", "email"]
+                model: User, attributes: ["id", "username", "email", "name", "id_type"]
             },
             {
                 model: Submission, attributes: ["id", "url", "date"]
@@ -125,7 +125,7 @@ exports.findOne = (req, res) => {
         where: { id: req.params.challengeID }, attributes: ['id', 'title', 'description', 'date_ini', 'date_end', 'img', 'rules', 'id_area', 'id_category'],
         include: [
             {
-                model: User, attributes: ["id", "username", "email"]
+                model: User, attributes: ["id", "username", "email", "name", "id_type"]
             },
             {
                 model: Submission, attributes: ["id", "url", "date"]

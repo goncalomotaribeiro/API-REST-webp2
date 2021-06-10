@@ -10,6 +10,9 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             validate: { notNull: { msg: "Date can not be empty!" } }
         },
+        classification: {
+            type: DataTypes.INTEGER,
+        },
         id_user: {
             type: DataTypes.INTEGER,
             allowNull: false,

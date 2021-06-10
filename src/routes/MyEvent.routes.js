@@ -1,6 +1,6 @@
 const express = require('express');
 const authController = require("../controllers/Auth.controller");
-const submissionController = require("../controllers/Submission.controller");
+const myEventController = require("../controllers/MyEvent.controller");
 
 let router = express.Router({ mergeParams: true });
 
@@ -15,17 +15,16 @@ router.use((req, res, next) => {
 })
 
 router.route('/')
-    .get(authController.verifyToken, submissionController.findAll)
-    .post(authController.verifyToken, submissionController.createSubmission);
+    .get(authController.verifyToken, myEventController.findAll)
+    .post(authController.verifyToken, myEventController.create);
 
-router.route('/:submissionID')
-    .get(authController.verifyToken, submissionController.findOne)
-    .put(authController.verifyToken, submissionController.update)
-    .delete(authController.verifyToken, submissionController.delete);
+router.route('/:myEventID')
+    .get(authController.verifyToken, myEventController.findOne)
+    .delete(authController.verifyToken, myEventController.delete);
 
 router.all('*', function (req, res) {
     //send an predefined error message 
-    res.status(404).json({ message: 'SUBMISSIONS: invalid request' });
+    res.status(404).json({ message: 'MYEVENTS: invalid request' });
 })
 
 module.exports = router;

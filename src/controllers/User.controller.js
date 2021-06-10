@@ -57,7 +57,7 @@ exports.findAll = (req, res) => {
                 model: Event, attributes: ["id", "title"]
             },
             {
-                model: Submission, attributes: ["id", "url", "date", "id_user"]
+                model: Submission, attributes: ["id", "url", "date"]
             },
             {
                 model: UserType, attributes: ["id", "type"]

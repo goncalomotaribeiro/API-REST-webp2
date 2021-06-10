@@ -59,6 +59,9 @@ db.event_category = require("./EventCategory.model.js")(sequelize, DataTypes);
 //export State model
 db.state = require("./State.model.js")(sequelize, DataTypes);
 
+//export MyEvent model
+db.my_event = require("./MyEvent.model.js")(sequelize, DataTypes);
+
 
 db.user_type.hasMany(db.user, {foreignKey: 'id_type'});
 db.user.belongsTo(db.user_type, {foreignKey: 'id_type'})

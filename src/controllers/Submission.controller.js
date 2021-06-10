@@ -1,5 +1,7 @@
 const db = require("../models/index.js");
 const Submission = db.submission;
+const User = db.user
+const Challenge = db.challenge
 const { Op } = require('sequelize')
 
 const getPagination = (page, size) => {
@@ -20,14 +22,15 @@ const getPagingData = (data, page, limit) => {
 // Display list of all submissions
 exports.findAll = (req, res) => {
 
-    let { page, size, id_user } = req.query;
+    let { page, size, id_challenge,id_user } = req.query;
     let condition
-    if (id_user && req.params.challengeID) {
-        condition = { [Op.and]: [{ id_user: id_user }, { id_challenge: req.params.challengeID }] }
+    
+    if (id_user && id_challenge) {
+        condition = { [Op.and]: [{ id_user: id_user }, { id_challenge: id_challenge }] }
     } else if (id_user) {
         condition = { id_user: id_user }
-    } else if (req.params.challengeID) {
-        condition = { id_challenge: { [Op.eq]: req.params.challengeID } }
+    } else if (id_challenge) {
+        condition = { id_challenge: { [Op.eq]: id_challenge } }
     }
     else { condition = null }
 
@@ -49,8 +52,15 @@ exports.findAll = (req, res) => {
     const { limit, offset } = getPagination(page, size);
 
     Submission.findAndCountAll({
-        attributes: ['id', 'url', 'date', 'id_user', 'id_challenge']
-        , where: condition, limit, offset
+        attributes: ['id', 'url', 'date', 'classification', 'id_user', 'id_challenge']
+        , where: condition, limit, offset,
+        include: [
+        {
+            model: User, attributes: ["id", "username", "email", "name", "id_type"]
+        },
+        {
+            model: Challenge, attributes: ["id", "title", "id_state"]
+        }]
     })
 
         .then(data => {
@@ -73,7 +83,7 @@ exports.createSubmission = async (req, res) => {
         return res.status(400).json({ message: 'Submission already assigned' });
 
     Submission.create({
-        url: req.body.url, date: req.body.date,
+        url: req.body.url, date: req.body.date, classification: req.body.classification,
         id_user: req.loggedUserId, id_challenge: req.params.challengeID
     })
         .then(data => {
@@ -95,8 +105,16 @@ exports.createSubmission = async (req, res) => {
 
 // List just one submission
 exports.findOne = (req, res) => {
-    Submission.findByPk(req.params.submissionID, { attributes: ['id', 'url', 'date', 'id_user', 'id_challenge'] })
-        .then(data => {
+    Submission.findOne({ where: { id: req.params.submissionID },  
+        attributes: ['id', 'url', 'date', 'classification', 'id_user', 'id_challenge'],
+        include: [
+            {
+                model: User, attributes: ["id", "username", "email", "name", "id_type"]
+            },
+            {
+                model: Challenge, attributes: ["id", "title", "id_state"]
+            }
+        ] }).then(data => {
             if (data === null)
                 res.status(404).json({
                     message: `Not found submission with id ${req.params.submissionID}.`
