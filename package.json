@@ -19,10 +19,10 @@
     "nodemon": "^2.0.7"
   },
   "scripts": {
-    "start": "nodemon ./src/index.js",
-    "dev": "nodemon ./src/index.js",
+    "start": "node ./src/index.js",
+    "dev": "node ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "web": "nodemon ./src/index.js"
+    "web": "node ./src/index.js"
   },
   "repository": {
     "type": "git",
