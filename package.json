@@ -13,16 +13,13 @@
     "mysql": "^2.18.1",
     "mysql2": "^2.2.5",
     "node": "^16.1.0",
-    "sequelize": "^6.6.2"
-  },
-  "devDependencies": {
+    "sequelize": "^6.6.2",
     "nodemon": "^2.0.7"
   },
   "scripts": {
-    "start": "nodem src/index.js",
-    "dev": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "npm run build"
+    "start": "nodemon src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
