@@ -4,9 +4,9 @@ const cors = require('cors');       // middleware to enable CORS (Cross-Origin R
 const fileUpload = require('express-fileupload');
 
 const app = express();
-const port = process.env.PORT || 8081;	
-// const port = process.env.PORT || 3000;	 	// if not defined, use port 8080
-const host = process.env.HOST || '127.0.0.1'; 	// if not defined, localhost
+// const port = process.env.PORT || 8081;	
+const port = process.env.PORT || 3000;	 	// if not defined, use port 8080
+// const host = process.env.HOST || '127.0.0.1'; 	// if not defined, localhost
 
 app.use(cors()); //enable ALL CORS requests (client requests from other domain)
 app.use(express.json()); //enable parsing JSON body data
@@ -48,12 +48,12 @@ app.get('*', function (req, res) {
     res.status(404).json({ message: 'WHAT???' });
 })
 
-// app.listen(port, () => console.log(`App listening on PORT ${port}/`));
+app.listen(port, () => console.log(`App listening on PORT ${port}/`));
 
 // start listening to client requests
-app.listen(port, host, () =>
-    console.log(`App listening at http://${host}:${port}/`)
-);
+// app.listen(port, host, () =>
+//     console.log(`App listening at http://${host}:${port}/`)
+// );
 
 
 
