@@ -1,4 +1,3 @@
-// const Tutorial = require('../models/tutorials.model.js');
 const db = require('../models/index.js');
 const User = db.user;
 const Submission = db.submission
@@ -6,6 +5,7 @@ const Challenge = db.challenge
 const Event = db.event
 const UserType = db.user_type
 const { Op } = require('sequelize')
+const bcrypt = require("bcryptjs");
 
 const getPagination = (page, size) => {
     const limit = size ? parseInt(size) : 3; // limit = size (default is 3)
@@ -109,17 +109,30 @@ exports.findOne = (req, res) => {
 
 // Update one user
 exports.update = async (req, res) => {
+    let user
+
     // check duplicate username
-    let user = await User.findOne(
-        { where: { username: req.body.username } }
-    );
+    if(req.body.username){
+        user = await User.findOne(
+            { where: { username: req.body.username } }
+        );
+    }
+
     if (user && req.params.userID != user.id)
         return res.status(400).json({ message: "Username already taken!" });
 
     // check duplicate email
-    user = await User.findOne(
-        { where: { email: req.body.email } }
-    );
+    if(req.body.email){
+        user = await User.findOne(
+            { where: { email: req.body.email } }
+        );
+    }
+
+     // check for updated password
+     if(req.body.password){
+        req.body.password = bcrypt.hashSync(req.body.password, 10)
+    }
+
     if (user && req.params.userID != user.id)
         return res.status(400).json({ message: "Email already associated with account!" });
 
