@@ -128,10 +128,10 @@ exports.update = async (req, res) => {
         );
     }
 
-     // check for updated password
-     if(req.body.password){
-        req.body.password = bcrypt.hashSync(req.body.password, 10)
-    }
+    //  // check for updated password
+    //  if(req.body.password){
+    //     req.body.password = bcrypt.hashSync(req.body.password, 10)
+    // }
 
     if (user && req.params.userID != user.id)
         return res.status(400).json({ message: "Email already associated with account!" });
